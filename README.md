@@ -18,6 +18,9 @@ The Fish Pond Monitoring System is an IoT system designed for monitoring fish po
   - Water Level Sensor
   - Water Pump
 
+## Local Interface
+Access the monitoring system locally via: [Fish Pond Monitoring System Interface](http://192.168.1.39:8123/fish-pond-monitoring-system)
+
 ## Installation Guide
 1. Ensure both Raspberry Pi 4 and ESP8266 are equipped with the necessary hardware and drivers.
 2. Connect the Raspberry Pi 4 to your router.
@@ -27,17 +30,52 @@ The Fish Pond Monitoring System is an IoT system designed for monitoring fish po
 - Configure and control the devices using ESP Home Assistant.
 - Monitoring data will be displayed on the OLED screen and can be viewed and managed through the Home Assistant interface.
 
-## Code Examples
-Here are some configuration code snippets for the ESP32 Cam and ESP8266:
+## ESPHome Configuration Examples
+Below are configuration code snippets for the ESP32 Cam and ESP8266:
+
+### ESP32 Cam Configuration
 ```yaml
-# Configuration for ESP32 Cam
 esphome:
   name: fish-pond-cam-1
-  ...
-  # [Complete configuration code]
+  friendly_name: FISH_POND_CAM_1
 
-# Configuration for ESP8266
-esphome:
-  name: fish-pond
-  ...
-  # [Complete configuration code]
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "68zj+48tgPiazmKNTMXPhWWMedGRmI1dEDnx5Xkr3Qk="
+
+ota:
+  password: "93ef3ef97ba52a1803957cae96ca44ae"
+
+wifi:
+  ssid: "IOT_2.4G"
+  password: "IOTEEB0202"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Fish-Pond-Cam-1 Fallback Hotspot"
+    password: "LzG00XyfVqwf"
+
+captive_portal:
+
+esp32_camera:
+  external_clock:
+    pin: GPIO0
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO26
+    scl: GPIO27
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+  vsync_pin: GPIO25
+  href_pin: GPIO23
+  pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
+  name: Camera01
