@@ -1,0 +1,122 @@
+esphome:
+  name: fish-pond
+  friendly_name: FISH_POND
+
+esp8266:
+  board: d1_mini
+
+logger:
+
+api:
+  encryption:
+    key: "CUILOZsYu37wK0/Gfv56PCMdNeC/lfiONMcWqnpYjaI="
+
+ota:
+  password: "fe7d8b26b40799b43673c5c35fad1404"
+
+wifi:
+  ssid: "IOT_2.4G"
+  password: "IOTEEB0202"
+
+  ap:
+    ssid: "Fish-Pond Fallback Hotspot"
+    password: "LH2syqIffwqz"
+
+captive_portal:
+
+dallas:
+  - pin: D4
+
+sensor:
+  - platform: dallas
+    address: 0xc73ce104575eb728 
+    id: Water_Temperature
+    name: "Water Temperature"
+
+  - platform: adc
+    pin: A0
+    id: tds_voltage
+    update_interval: 10s
+
+  - platform: template
+    name: "TDS"
+    id: tds_value
+    unit_of_measurement: "ppm"
+    accuracy_decimals: 2
+    icon: "mdi:water"
+    lambda: |-
+      const float Vmax = 5.0;
+      const float TDSFactor = 500.0;
+      float voltage = id(tds_voltage).state;
+      return (voltage /Vmax) * TDSFactor;
+    update_interval: 5s
+
+
+  - platform: dht
+    pin: D0
+    model: DHT11
+    temperature:
+      name: "Outdoor Temperature"
+    humidity:
+      name: "Outdoor Humidity"
+    update_interval: 5s
+
+
+servo:
+  - id: my_servo
+    output: pwm_output
+
+output:
+  - platform: esp8266_pwm
+    id: pwm_output
+    pin: D3 
+    frequency: 50 Hz
+
+switch:
+  - platform: gpio
+    name: "LED"
+    pin: D6
+
+  - platform: gpio
+    name: "Water Pump"
+    pin: D5  
+    restore_mode: ALWAYS_OFF
+
+  - platform: template
+    name: "Feeder"
+    turn_on_action:
+      - servo.write:
+          id: my_servo
+          level: 55%
+      - delay: 1s
+      - servo.write:
+          id: my_servo
+          level: 0%
+
+binary_sensor:
+  - platform: gpio
+    name: "Full Water Level"
+    pin: D7
+
+font:
+  - file: "gfonts://Roboto"
+    id: roboto
+    size: 15
+
+i2c:
+  sda: D2
+  scl: D1
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+    lambda: |-
+      char str[30];
+      snprintf(str, sizeof(str), "TDS: %.1f ppm", id(tds_value).state);
+      it.print(0, 0, id(roboto), str);
+
+      snprintf(str, sizeof(str), "Temp: %.1f°C", id(Water_Temperature).state);
+      it.print(10, 30, id(roboto), str);
+
+
