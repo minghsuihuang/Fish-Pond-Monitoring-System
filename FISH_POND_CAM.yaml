@@ -2,32 +2,38 @@ esphome:
   name: fish-pond-cam-1
   friendly_name: FISH_POND_CAM_1
 
+# Configuration for an ESP32 board, using the Arduino framework
 esp32:
   board: esp32dev
   framework:
     type: arduino
 
-# Enable logging
+# Enable logging for debugging purposes
 logger:
 
-# Enable Home Assistant API
+# Home Assistant API setup with encryption for secure data transmission
 api:
   encryption:
     key: "68zj+48tgPiazmKNTMXPhWWMedGRmI1dEDnx5Xkr3Qk="
 
+# OTA updates configuration with a password for security
 ota:
   password: "93ef3ef97ba52a1803957cae96ca44ae"
 
+# WiFi connection details
 wifi:
   ssid: "IOT_2.4G"
   password: "IOTEEB0202"
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  # Fallback hotspot configuration in case the primary WiFi fails
   ap:
     ssid: "Fish-Pond-Cam-1 Fallback Hotspot"
     password: "LzG00XyfVqwf"
 
+# Captive portal for initial WiFi configuration and troubleshooting
 captive_portal:
+
+# ESP32 camera configuration
 esp32_camera:
     external_clock:
       pin: GPIO0
