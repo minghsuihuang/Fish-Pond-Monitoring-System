@@ -2,42 +2,54 @@ esphome:
   name: fish-pond
   friendly_name: FISH_POND
 
+# Configures an ESP8266 board, specifically a D1 Mini
 esp8266:
   board: d1_mini
 
+# Enables the logging feature
 logger:
 
+# Sets up the API, including encryption for secure communication
 api:
   encryption:
     key: "CUILOZsYu37wK0/Gfv56PCMdNeC/lfiONMcWqnpYjaI="
 
+# Over-the-air (OTA) update configuration with a password for security
 ota:
   password: "fe7d8b26b40799b43673c5c35fad1404"
 
+# WiFi configuration details
 wifi:
   ssid: "IOT_2.4G"
   password: "IOTEEB0202"
 
+  # Access Point mode configuration for fallback if WiFi fails
   ap:
     ssid: "Fish-Pond Fallback Hotspot"
     password: "LH2syqIffwqz"
 
+# Enable the captive portal for easier WiFi configuration
 captive_portal:
 
+# Dallas temperature sensor configuration
 dallas:
   - pin: D4
 
+# Sensor configurations
 sensor:
+  # Dallas temperature sensor to measure water temperature
   - platform: dallas
     address: 0xc73ce104575eb728 
     id: Water_Temperature
     name: "Water Temperature"
 
+  # Analog-to-digital converter sensor for measuring TDS voltage
   - platform: adc
     pin: A0
     id: tds_voltage
     update_interval: 10s
 
+  # Template sensor for calculating TDS (Total Dissolved Solids)
   - platform: template
     name: "TDS"
     id: tds_value
@@ -48,10 +60,10 @@ sensor:
       const float Vmax = 5.0;
       const float TDSFactor = 500.0;
       float voltage = id(tds_voltage).state;
-      return (voltage /Vmax) * TDSFactor;
+      return (voltage / Vmax) * TDSFactor;
     update_interval: 5s
 
-
+  # DHT sensor for measuring outdoor temperature and humidity
   - platform: dht
     pin: D0
     model: DHT11
@@ -61,17 +73,19 @@ sensor:
       name: "Outdoor Humidity"
     update_interval: 5s
 
-
+# Servo motor configuration
 servo:
   - id: my_servo
     output: pwm_output
 
+# PWM output configuration for the servo motor
 output:
   - platform: esp8266_pwm
     id: pwm_output
     pin: D3 
     frequency: 50 Hz
 
+# Switch configurations for various components
 switch:
   - platform: gpio
     name: "LED"
@@ -82,6 +96,7 @@ switch:
     pin: D5  
     restore_mode: ALWAYS_OFF
 
+  # Template switch for controlling the fish feeder
   - platform: template
     name: "Feeder"
     turn_on_action:
@@ -93,20 +108,24 @@ switch:
           id: my_servo
           level: 0%
 
+# Binary sensor for detecting water level
 binary_sensor:
   - platform: gpio
     name: "Full Water Level"
     pin: D7
 
+# Font configuration for display
 font:
   - file: "gfonts://Roboto"
     id: roboto
     size: 15
 
+# I2C configuration
 i2c:
   sda: D2
   scl: D1
 
+# Display configuration for showing sensor readings
 display:
   - platform: ssd1306_i2c
     model: "SSD1306 128x64"
@@ -118,5 +137,3 @@ display:
 
       snprintf(str, sizeof(str), "Temp: %.1f°C", id(Water_Temperature).state);
       it.print(10, 30, id(roboto), str);
-
-
